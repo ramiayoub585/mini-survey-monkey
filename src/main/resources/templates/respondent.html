@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Take a survey</title>
+</head>
+<body>
+<h1>Available Surveys</h1>
+<p><a th:href="@{/}">Back to the Home Page</a></p>
+
+<p th:if="${#lists.isEmpty(surveys)}">No surveys are open right now. Check back soon.</p>
+
+<ul>
+  <li th:each="survey : ${surveys}">
+    <span th:text="${survey.title}">Title</span>
+    - <a th:href="@{/surveys/{id}/fill(id=${survey.id})}">Take survey</a>
+  </li>
+</ul>
+</body>
+</html>

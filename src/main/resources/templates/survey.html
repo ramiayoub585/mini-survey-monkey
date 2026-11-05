@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Survey</title>
+</head>
+<body>
+<h1 th:text="${survey.title}">Survey</h1>
+<p><a th:href="@{/surveyor}">Back to the Surveyors Page</a></p>
+
+<p>Status: <span th:text="${survey.active} ? 'Open' : 'Closed'">Open</span></p>
+<p>Questions: <span th:text="${#lists.size(survey.questions)}">0</span></p>
+<p><a th:href="@{/surveys/{id}/questions(id=${survey.id})}">Add or view questions</a></p>
+</body>
+</html>

@@ -8,7 +8,7 @@ public class Question {
     @Id
     @GeneratedValue
     private long id;
-    @EnumeratedValue
+    @Enumerated(EnumType.STRING)
     private QuestionType questionType;
     private String text;
     private Integer minValue;
@@ -49,15 +49,10 @@ public class Question {
         this.maxValue = maxValue;
     }
 
-    public List<String> getOptions() {
-        return options;
-    }
-    public void setOptions() {
-        this.options = new ArrayList<String>(options);
-    }
-    public QuestionType getType() {
-        return questionType;
-    }
+    public QuestionType getQuestionType() { return questionType; }
+    public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
+    public QuestionType getType() { return questionType; }   // the controller calls this
+    public List<String> getOptions() { return options; }
 
     public String validate(){
         if(questionType == null){
