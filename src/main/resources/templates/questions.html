@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Questions - ' + ${survey.title}">Questions</title>
+</head>
+<body>
+
+<h1 th:text="${survey.title}">Survey title</h1>
+
+<h2>Questions</h2>
+<p th:if="${#lists.isEmpty(survey.questions)}">No questions yet.</p>
+<ol>
+    <li th:each="q : ${survey.questions}">
+        <span th:text="${q.text}">Question text</span>
+        <span th:text="'(' + ${q.questionType} + ')'">(TEXT)</span>
+        <span th:if="${q.questionType?.name() == 'NUMBER'}"
+              th:text="'- number from ' + ${q.minValue} + ' to ' + ${q.maxValue}"></span>
+        <ul th:if="${q.questionType?.name() == 'CHOICE'}">
+            <li th:each="option : ${q.options}" th:text="${option}">Option</li>
+        </ul>
+    </li>
+</ol>
+
+<h2>Add a question</h2>
+<p style="color: red" th:if="${error}" th:text="${error}">Error message</p>
+
+<form th:action="@{/surveys/{id}/questions(id=${survey.id})}" th:object="${question}" method="post">
+    <p>Question: <input type="text" th:field="*{text}" required size="60"></p>
+
+    <p>Type:
+        <select th:field="*{questionType}">
+            <option th:each="t : ${questionTypes}" th:value="${t}" th:text="${t}">TEXT</option>
+        </select>
+    </p>
+
+    <div id="numberFields">
+        <p>Minimum: <input type="number" th:field="*{minValue}"></p>
+        <p>Maximum: <input type="number" th:field="*{maxValue}"></p>
+    </div>
+
+    <div id="choiceFields">
+        <p>Options (one per line):</p>
+        <textarea name="optionsText" rows="5" cols="40" th:text="${optionsText}"></textarea>
+    </div>
+
+    <button type="submit">Add question</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script th:src="@{/js/questions.js}"></script>
+</body>
+</html>

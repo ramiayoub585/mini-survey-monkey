@@ -13,6 +13,7 @@ public class Survey {
     private boolean active;
 
     @OneToMany (cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn
     private List<Question> questions;
 
     public Survey() {
