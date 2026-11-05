@@ -5,5 +5,4 @@ import java.util.*;
 
 
 public interface SurveyResponseRepository extends JpaRepository<SurveyResponse, Long> {
-    List<SurveyResponse> findBySurvey(Survey survey);
 }

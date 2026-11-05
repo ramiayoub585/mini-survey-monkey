@@ -7,6 +7,7 @@
 <body>
 
 <h1 th:text="${survey.title}">Survey title</h1>
+<p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
 
 <h2>Questions</h2>
 <p th:if="${#lists.isEmpty(survey.questions)}">No questions yet.</p>
@@ -48,6 +49,6 @@
 </form>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script th:src="@{/js/questions.js}"></script>
+<script th:src="@{/js/question.js}"></script>
 </body>
 </html>
