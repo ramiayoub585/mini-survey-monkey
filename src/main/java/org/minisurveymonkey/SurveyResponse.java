@@ -30,4 +30,12 @@ public class SurveyResponse {
     public List<Answer> getAnswers() {
         return answers;
     }
+
+    public void addAnswer(Answer a){
+        answers.add(a);
+    }
+
+    public void setSurvey(Survey survey) {
+        this.survey = survey;
+    }
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Survey</title>
+</head>
+<body>
+<h1 th:text="${fill.title}">Survey title</h1>
+<p><a th:href="@{/surveys/{id}(id=${fill.id})}">Back to Survey Page</a></p>
+
+<p th:if="${#lists.isEmpty(fill.questions)}">No questions yet.</p>
+
+<form th:action="@{/surveys/{id}/fill(id=${fill.id})}" method="post">
+  <ol>
+    <li th:each="q : ${fill.questions}">
+      <span th:text="${q.text}">Question text</span>
+
+      <!-- TEXT: a free-text box -->
+      <input th:if="${q.questionType?.name() == 'TEXT'}"
+             type="text"
+             th:name="|q_${q.id}|"
+             required>
+
+      <!-- NUMBER: picking a number within range -->
+      <input th:if="${q.questionType?.name() == 'NUMBER'}"
+             type="number"
+             th:name="|q_${q.id}|"
+             th:min="${q.minValue}"
+             th:max="${q.maxValue}"
+             required>
+
+      <!-- CHOICE: picking one of the listed choices -->
+      <div th:if="${q.questionType?.name() == 'CHOICE'}">
+        <label th:each="option : ${q.options}">
+          <input type="radio"
+                 th:name="|q_${q.id}|"
+                 th:value="${option}"
+                 required>
+          <span th:text="${option}">Option</span>
+        </label>
+      </div>
+    </li>
+  </ol>
+
+  <!-- Submit Button -->
+  <button type="submit">Submit</button>
+</form>
+</body>
+</html>
