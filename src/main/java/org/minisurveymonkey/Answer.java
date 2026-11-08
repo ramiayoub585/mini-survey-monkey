@@ -25,4 +25,8 @@ public class Answer {
     public String getAnswer() {
         return answer;
     }
+
+    public void setQuestion(Question question) {this.question = question;}
+    public void setAnswer(String answer) {this.answer = answer;}
+
 }
