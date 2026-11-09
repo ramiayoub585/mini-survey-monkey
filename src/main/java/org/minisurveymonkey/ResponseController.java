@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -72,5 +75,35 @@ public class ResponseController {
 
         SurveyResponse saved = surveyResponseRepository.save(surveyResponse);
         return "redirect:/respondent";
+    }
+
+    @GetMapping("/surveys/{id}/results")
+    public String viewResults(@PathVariable Long id, Model model) {
+        Survey survey = surveyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (survey.isActive()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Survey is still open");
+        }
+
+        List<SurveyResponse> responses = surveyResponseRepository.findBySurvey(survey);
+
+        Map<Long, List<String>> answersByQuestion = new HashMap<>();
+        for (SurveyResponse response : responses) {
+            for (Answer answer : response.getAnswers()) {
+                answersByQuestion.computeIfAbsent(answer.getQuestion().getId(), k -> new ArrayList<>())
+                        .add(answer.getAnswer());
+            }
+        }
+
+        List<QuestionResult> results = new ArrayList<>();
+        for (Question question : survey.getQuestions()) {
+            results.add(new QuestionResult(question, answersByQuestion.getOrDefault(question.getId(), List.of())));
+        }
+
+        model.addAttribute("survey", survey);
+        model.addAttribute("responseCount", responses.size());
+        model.addAttribute("results", results);
+        return "results";
     }
 }

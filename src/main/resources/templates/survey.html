@@ -11,5 +11,10 @@
 <p>Status: <span th:text="${survey.active} ? 'Open' : 'Closed'">Open</span></p>
 <p>Questions: <span th:text="${#lists.size(survey.questions)}">0</span></p>
 <p><a th:href="@{/surveys/{id}/questions(id=${survey.id})}">Add or view questions</a></p>
+
+<form th:if="${survey.active}" th:action="@{/surveys/{id}/close(id=${survey.id})}" method="post">
+  <button type="submit">Close survey</button>
+</form>
+<p th:unless="${survey.active}"><a th:href="@{/surveys/{id}/results(id=${survey.id})}">View results</a></p>
 </body>
 </html>

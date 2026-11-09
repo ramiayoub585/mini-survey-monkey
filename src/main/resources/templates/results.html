@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="'Results - ' + ${survey.title}">Results</title>
+</head>
+<body>
+<h1 th:text="${survey.title}">Survey title</h1>
+<p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
+
+<p>Responses: <span th:text="${responseCount}">0</span></p>
+<p th:if="${#lists.isEmpty(results)}">No questions yet.</p>
+
+<ol>
+  <li th:each="r : ${results}">
+    <span th:text="${r.question.text}">Question text</span>
+    <span th:text="'(' + ${r.question.questionType} + ')'">(TEXT)</span>
+
+    <p th:if="${#lists.isEmpty(r.answers)}">No answers.</p>
+
+    <ul th:if="${r.question.questionType?.name() == 'TEXT' and !#lists.isEmpty(r.answers)}">
+      <li th:each="a : ${r.answers}" th:text="${a}">Answer</li>
+    </ul>
+
+    <table th:if="${r.question.questionType?.name() != 'TEXT' and !#lists.isEmpty(r.answers)}" border="1" cellpadding="6">
+      <thead><tr><th>Answer</th><th>Count</th></tr></thead>
+      <tbody>
+      <tr th:each="entry : ${r.counts}">
+        <td th:text="${entry.key}">Value</td>
+        <td th:text="${entry.value}">0</td>
+      </tr>
+      </tbody>
+    </table>
+  </li>
+</ol>
+</body>
+</html>

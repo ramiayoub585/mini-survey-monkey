@@ -51,4 +51,13 @@ public class SurveyController {
         model.addAttribute("survey", survey);
         return "survey";
     }
+
+    @PostMapping("/surveys/{id}/close")
+    public String closeSurvey(@PathVariable Long id) {
+        Survey survey = surveyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        survey.setActive(false);
+        surveyRepository.save(survey);
+        return "redirect:/surveys/" + id;
+    }
 }
