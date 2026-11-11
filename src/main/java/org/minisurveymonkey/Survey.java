@@ -4,17 +4,20 @@ import jakarta.persistence.*;
 
 import java.util.*;
 
+/**
+ * The survey that is created by the surveyor. When the survey is open the respondants can answer the questions of that survey. When its closed they can no longer answer the survey.
+ */
 @Entity
 public class Survey {
     @Id
     @GeneratedValue
     private long id;
     private String title;
-    private boolean active;
+    private boolean active; // The status of the survey as open or close.
 
     @OneToMany (cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn
-    private List<Question> questions;
+    private List<Question> questions; // The questions associated with the survey.
 
     public Survey() {
         questions = new ArrayList<Question>();

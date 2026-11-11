@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The controller that handles the page where the respondents answer questions and how it gets the results of the questions.
+ */
 @Controller
 public class ResponseController {
 
@@ -77,6 +80,7 @@ public class ResponseController {
         return "redirect:/respondent";
     }
 
+    // Get the results of the respondents once the survey is closed.
     @GetMapping("/surveys/{id}/results")
     public String viewResults(@PathVariable Long id, Model model) {
         Survey survey = surveyRepository.findById(id)

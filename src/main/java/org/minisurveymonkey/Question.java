@@ -3,16 +3,21 @@ package org.minisurveymonkey;
 import jakarta.persistence.*;
 import java.util.*;
 
+/**
+ * The Questions that the surveyor can create in a survey. There are three types: TEXT (free-text answer), NUMBER (answer between minValue and maxValue) and
+ * CHOICE (pick one of the options).
+ */
+
 @Entity
 public class Question {
     @Id
     @GeneratedValue
     private long id;
     @Enumerated(EnumType.STRING)
-    private QuestionType questionType;
-    private String text;
-    private Integer minValue;
-    private Integer maxValue;
+    private QuestionType questionType; // The type of question for the three choices mentioned above
+    private String text; // The question being show to the respondent
+    private Integer minValue; // Min value for Number questions only
+    private Integer maxValue; // Max value for Number questions only
     @ElementCollection
     @OrderColumn
     private List<String> options;
@@ -54,6 +59,10 @@ public class Question {
     public QuestionType getType() { return questionType; }   // the controller calls this
     public List<String> getOptions() { return options; }
 
+    /**
+     * This check ensures that question has all complete attributes, ie. a type and text, min and max for number values, etc.
+     * @return An error message to the user or null if the question is complete.
+     */
     public String validate(){
         if(questionType == null){
             return "Please choose a question type";
