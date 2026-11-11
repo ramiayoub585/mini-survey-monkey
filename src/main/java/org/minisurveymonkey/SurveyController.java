@@ -6,6 +6,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * The controller that handles the main page selecting the role of a surveyor or a respondent. It also handles the creating and handling of surveys in the survey page.
+ */
 @Controller
 public class SurveyController {
 
@@ -15,35 +18,37 @@ public class SurveyController {
         this.surveyRepository = surveyRepository;
     }
 
-    // Role chooser
+    // Home page to select the role
     @GetMapping("/")
     public String home() {
         return "home";
     }
 
-    // Surveyor dashboard
+    // The surveyor side
     @GetMapping("/surveyor")
     public String surveyor(Model model) {
         model.addAttribute("surveys", surveyRepository.findAll());
         return "surveyor";
     }
 
-    // Respondent page: open surveys only
+    // The respondent side
     @GetMapping("/respondent")
     public String respondent(Model model) {
         model.addAttribute("surveys", surveyRepository.findByActiveTrue());
         return "respondent";
     }
 
+    // Creating a new survey
     @PostMapping("/surveys")
     public String createSurvey(@RequestParam String title) {
         Survey survey = new Survey();
         survey.setTitle(title.trim());
-        survey.setActive(true);            // new surveys start open
+        survey.setActive(true);
         surveyRepository.save(survey);
         return "redirect:/surveyor";
     }
 
+    // Viewing the survey
     @GetMapping("/surveys/{id}")
     public String viewSurvey(@PathVariable Long id, Model model) {
         Survey survey = surveyRepository.findById(id)
@@ -52,6 +57,7 @@ public class SurveyController {
         return "survey";
     }
 
+    // Closing the survey
     @PostMapping("/surveys/{id}/close")
     public String closeSurvey(@PathVariable Long id) {
         Survey survey = surveyRepository.findById(id)
