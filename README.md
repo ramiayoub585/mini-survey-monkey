@@ -21,6 +21,10 @@ cd mini-survey-monkey
 mvn package
 java -jar target/Mini-SurveyMonkey-1.0-SNAPSHOT.jar
 ```
+To start with sample surveys (one open and one closed), run the app with the `dev` profile instead:
+```
+java -jar target/Mini-SurveyMonkey-1.0-SNAPSHOT.jar --spring.profiles.active=dev
+```
 
 ## Milestone 1 (Current Phase)
 An early prototype of the application. The application is not fully polished but the main functionalities are working and are the following: 
@@ -38,12 +42,49 @@ An early prototype of the application. The application is not fully polished but
 - Having the ability to edit/delete a question from a survey. 
 - Styling the different pages making them look nicer and aligning them together. 
 - Handle some bugs, ie. remove the ability to add a question when a survey is closed, displaying min/max values to respondent for number questions, etc.
-
-## Database Schema 
-///TO DO (Liam)///
+- Tests for the new features ensuring functionality of the program remains consistent. 
 
 ## UML Diagram
-///TO DO (Liam)///
+![UML Class Diagram](docs/uml-class-diagram.png)
+
+## Database Schema
+Mini Survey Monkey uses Spring Data JPA with Hibernate ORM to manage database persistence. Mini Survey Monkey uses an H2 in-memory database where the database schema is automatically generated from the JPA entity classes when the application starts. 
+The database is used to store surveys, questions, responses and answers.
+
+### Main Entities
+This table lists the entities and fields in the database.
+
+| Entity | Fields | Description                                                                           |
+|---|---|---------------------------------------------------------------------------------------|
+| `Survey` | `id`, `title`, `active` | Stores a survey's identifier, title, and whether it is accepting responses.           |
+| `Question` | `id`, `text`, `questionType`, `minValue`, `maxValue` | Stores questions belonging to surveys, including their type and number constraints.   |
+| `SurveyResponse` | `id`, `survey` | Stores a completed survey submission referenced to the survey the submission answers. |
+| `Answer` | `id`, `question`, `answer` | Stores an individual answer referenced to the question it answers.                    |
+
+### Database Relationships
+- **Survey → Question:** One-to-many. Each survey contains a list of questions. Questions are persisted using cascading operations.
+- **Survey → SurveyResponse:** One-to-many. Each submitted response references a survey using a many-to-one relationship.
+- **SurveyResponse → Answer:** One-to-many. Each response contains a list of answers, which are persisted using cascading operations.
+- **Question → Answer:** One-to-many. Each answer references a question using a many-to-one relationship.
+
+### Additional Database Tables
+Hibernate also generates additional tables to persist collections and relationships:
+
+- **Survey questions collection:** Maintains the association and ordering of questions within each survey.
+- **Question options collection:** Stores the available options for multiple-choice questions and their order.
+- **Survey response answers collection:** Maintains the association between survey responses and their answers.
+
+### Question Types
+Questions use the `QuestionType` enumeration, which has the following options:
+
+- `TEXT`: Text responses.
+- `NUMBER`: Numeric responses with optional min and max constraints.
+- `CHOICE`: Multiple choice responses with a list of options.
+
+### Database Configuration
+Spring Boot configures the database connection, while Hibernate manages the database schema based on the JPA entity mappings.
+
+Since the default database is in memory, its contents are not saved on application shut down.
 
 ## Project Status
 [Mini-SurveyMonkey Board](https://github.com/users/ramiayoub585/projects/2)
