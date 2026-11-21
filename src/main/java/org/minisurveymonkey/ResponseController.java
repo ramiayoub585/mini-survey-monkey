@@ -77,7 +77,7 @@ public class ResponseController {
         }
 
         SurveyResponse saved = surveyResponseRepository.save(surveyResponse);
-        return "redirect:/respondent";
+        return "redirect:/surveys/" + id + "/confirmation";
     }
 
     // Get the results of the respondents once the survey is closed.

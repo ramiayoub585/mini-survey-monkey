@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Response Recorded</title>
+</head>
+<body>
+
+<h1>Your response was recorded!</h1>
+<p>
+    Thank you for completing the survey:
+    <strong th:text="${survey.title}">
+        Survey Title
+    </strong>
+</p>
+<p>
+    Your answers have been successfully saved.
+</p>
+<p>
+    <a th:href="@{/respondent}">
+        Back to Available Surveys
+    </a>
+</p>
+<p>
+    <a th:href="@{/}">
+        Return to Home
+    </a>
+</p>
+</body>
+</html>
