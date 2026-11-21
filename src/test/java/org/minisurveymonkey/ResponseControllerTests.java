@@ -54,7 +54,7 @@ public class ResponseControllerTests {
         long before = responseRepository.count();
         mockMvc.perform(post("/surveys/" + survey.getId() + "/fill").param("q_" + questionId, "Alice"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/respondent"));
+                .andExpect(redirectedUrl("/surveys/" + survey.getId() + "/confirmation"));
         assertEquals(before + 1, responseRepository.count()); // assert response was received
 
         var responses = responseRepository.findBySurvey(survey);
