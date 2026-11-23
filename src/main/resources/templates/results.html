@@ -1,18 +1,60 @@
 <!DOCTYPE html>
+<!--/*
+  Results page (ResponseController.viewResults). Model: survey, responseCount and results
+  (one QuestionResult per question). TEXT answers are listed. NUMBER questions get a bar histogram
+  and CHOICE questions get a pie chart (Chart.js from a CDN), with the counts table underneath.
+  The chart data is passed into the page with th:inline="javascript".
+*/-->
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
   <title th:text="'Results - ' + ${survey.title}">Results</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script>
+    const COLORS = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f',
+      '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
+
+    // Draws one chart: a bar histogram for NUMBER, a pie chart for CHOICE
+    function drawChart(index, type, labels, values) {
+      const canvas = document.getElementById('chart-' + index);
+      if (!canvas) return;
+      if (type === 'CHOICE') {
+        const total = values.reduce((a, b) => a + b, 0);
+        new Chart(canvas, {
+          type: 'pie',
+          data: {
+            // The legend and tooltips show each option with its count and percentage
+            labels: labels.map((label, i) =>
+                    label + ': ' + values[i] + ' (' + (total ? Math.round(values[i] * 100 / total) : 0) + '%)'),
+            datasets: [{ data: values, backgroundColor: values.map((v, i) => COLORS[i % COLORS.length]) }]
+          }
+        });
+      } else {
+        new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{ label: 'Number of answers', data: values, backgroundColor: COLORS[0] }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+      }
+    }
+  </script>
 </head>
 <body>
 <h1 th:text="${survey.title}">Survey title</h1>
 <p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
 
 <p>Responses: <span th:text="${responseCount}">0</span></p>
+<p th:if="${responseCount == 0}">No responses yet. Charts will appear here once someone has answered the survey.</p>
 <p th:if="${#lists.isEmpty(results)}">No questions yet.</p>
 
 <ol>
-  <li th:each="r : ${results}">
+  <li th:each="r, rStat : ${results}">
     <span th:text="${r.question.text}">Question text</span>
     <span th:text="'(' + ${r.question.questionType} + ')'">(TEXT)</span>
 
@@ -21,6 +63,14 @@
     <ul th:if="${r.question.questionType?.name() == 'TEXT' and !#lists.isEmpty(r.answers)}">
       <li th:each="a : ${r.answers}" th:text="${a}">Answer</li>
     </ul>
+
+    <div th:if="${r.chartable}" style="max-width: 480px;">
+      <canvas th:id="'chart-' + ${rStat.index}"></canvas>
+    </div>
+    <script th:if="${r.chartable}" th:inline="javascript">
+      drawChart(/*[[${rStat.index}]]*/ 0, /*[[${r.question.questionType.name()}]]*/ 'CHOICE',
+              /*[[${r.chartLabels}]]*/ [], /*[[${r.chartValues}]]*/ []);
+    </script>
 
     <table th:if="${r.question.questionType?.name() != 'TEXT' and !#lists.isEmpty(r.answers)}" border="1" cellpadding="6">
       <thead><tr><th>Answer</th><th>Count</th></tr></thead>
