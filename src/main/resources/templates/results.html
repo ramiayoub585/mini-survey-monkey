@@ -19,6 +19,9 @@
     function drawChart(index, type, labels, values) {
       const canvas = document.getElementById('chart-' + index);
       if (!canvas) return;
+      const style = getComputedStyle(canvas);
+      Chart.defaults.font.family = style.fontFamily;
+      Chart.defaults.color = style.getPropertyValue('--ink-muted');
       if (type === 'CHOICE') {
         const total = values.reduce((a, b) => a + b, 0);
         new Chart(canvas, {
@@ -28,7 +31,8 @@
             labels: labels.map((label, i) =>
                     label + ': ' + values[i] + ' (' + (total ? Math.round(values[i] * 100 / total) : 0) + '%)'),
             datasets: [{ data: values, backgroundColor: values.map((v, i) => COLORS[i % COLORS.length]) }]
-          }
+          },
+          options: { aspectRatio: 1.5 }
         });
       } else {
         new Chart(canvas, {
@@ -66,7 +70,7 @@
       <li th:each="a : ${r.answers}" th:text="${a}">Answer</li>
     </ul>
 
-    <div th:if="${r.chartable}" style="max-width: 480px;">
+    <div th:if="${r.chartable}">
       <canvas th:id="'chart-' + ${rStat.index}"></canvas>
     </div>
     <script th:if="${r.chartable}" th:inline="javascript">
