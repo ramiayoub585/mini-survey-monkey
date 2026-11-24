@@ -17,7 +17,7 @@ import java.util.*;
  */
 @Controller
 public class ResponseController {
-    private static final int MAX_TEXT_LENGTH = 1000;
+    private static final int MAX_TEXT_LENGTH = 255;
     private final SurveyRepository surveyRepository;
     private final SurveyResponseRepository  surveyResponseRepository;
 
