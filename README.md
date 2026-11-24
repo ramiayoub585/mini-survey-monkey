@@ -14,7 +14,7 @@ The Mini-SurveyMonkey is a small web app where a surveyor creates a survey with 
 - Andrew Tawfik 
 
 ## How to Run
-Requires Java 21 or later and Maven.
+Requires Java 23 or later and Maven.
 ```
 git clone https://github.com/ramiayoub585/mini-survey-monkey.git
 cd mini-survey-monkey
@@ -26,23 +26,24 @@ To start with sample surveys (one open and one closed), run the app with the `de
 java -jar target/Mini-SurveyMonkey-1.0-SNAPSHOT.jar --spring.profiles.active=dev
 ```
 
-## Milestone 1 (Current Phase)
-An early prototype of the application. The application is not fully polished but the main functionalities are working and are the following: 
+## Milestone 2 (Current Phase)
+The alpha release. Everything from Milestone 1 works, plus the features and fixes from the TA's feedback:
 
-- **Survey Creation:** A surveyor is able to create a survey and manage a list of the created surveys. 
-- **Questions:** A surveyor can add a question (3 types: Text, Number, Choice) for the respondents to answer. 
-- **Filling Out Survey:** A respondent selects from the list of open surveys and fills out all questions for that survey. Once the survey is closed, they can no longer answer. 
-- **Closing and Results:** The surveyor closes the survey which becomes unavailable for the respondents. A results page is shown to the surveyor with the complied answers to the survey questions. The text answers are listed and number and choice answers are counted.
-- **Tests and Sample Data:** Startup tests run CI, integration tests are also added (see test folders). A sample survey can be loaded using the dev profile (DevSampleSurveys). 
+- **Surveys:** A surveyor creates surveys and manages them from one list, with each survey marked Open or Closed.
+- **Questions:** A surveyor adds text, number (with a min and max) and multiple-choice questions, and can edit or delete them. Questions are locked once a survey is closed or has answers.
+- **Filling Out a Survey:** A respondent picks an open survey, answers every question and sees a confirmation page. Answers are checked on the server, and number questions show their allowed range. Closed surveys can no longer be answered.
+- **Closing and Results:** The surveyor closes a survey after confirming. The results page lists text answers, shows a histogram for number questions and a pie chart for multiple-choice questions, with the counts underneath.
+- **Navigation and Styling:** Every page shares a header with links home, to Manage surveys and to Take a survey. All pages use one stylesheet, work at phone width, and show a friendly page for errors such as a missing or closed survey.
+- **Database:** Data is stored in a persistent database on Azure, so surveys and responses survive a restart.
+- **Tests:** Unit and integration tests are split into files by behaviour and run in CI on every pull request. Sample surveys load with the `dev` profile (`DevSampleSurveys`).
 
-## Next Sprint 
-- Adding a method for surveyor authentication, ie. login credentials.
-- Displaying the results of the survey through charts (example: histogram, pie charts, etc.).
-- Giving confirmation to the user once they have successfully answered a survey. 
-- Having the ability to edit/delete a question from a survey. 
-- Styling the different pages making them look nicer and aligning them together. 
-- Handle some bugs, ie. remove the ability to add a question when a survey is closed, displaying min/max values to respondent for number questions, etc.
-- Tests for the new features ensuring functionality of the program remains consistent. 
+## Milestone 3 Plan
+The final release, shown at the final demo:
+
+- **Surveyor login:** Surveyors sign in, and each surveyor only sees and manages their own surveys. Respondents can still answer without an account.
+- **Form accessibility:** Every question on the fill and add-question pages gets a proper label, so the forms work with screen readers and keyboards.
+- **Demo feedback:** Fix the bugs and usability issues found at the Milestone 2 demo.
+- **Tests:** Tests for each new feature, keeping CI green on every pull request.
 
 ## UML Diagram
 ![UML Class Diagram](docs/uml-class-diagram.png)
@@ -89,11 +90,11 @@ Since the default database is in memory, its contents are not saved on applicati
 ## Project Status
 [Mini-SurveyMonkey Board](https://github.com/users/ramiayoub585/projects/2)
 
-| Column | Items                                                                                                                         |
-|---|-------------------------------------------------------------------------------------------------------------------------------|
-| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results and Job 5 Tests and demo |
-| In progress | -                                                                                                                             |
-| Backlog | -                                                                                                                             |
+| Column | Items |
+|---|---|
+| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results, Job 5 Tests and demo, Make repo public and protect main, Bundle 5 Results charts and multiple-choice fix |
+| In progress | Bundle 1 Real database and schema, Bundle 2 Edit/delete questions, Bundle 3 Answer validation, confirmation and test cleanup, Bundle 4 Header, styling and README |
+| Backlog | Milestone 3 plan above |
 
 ## Development Process
 - Every feature is built on its own branch.
