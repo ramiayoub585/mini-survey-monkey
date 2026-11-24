@@ -5,7 +5,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -100,5 +99,50 @@ class QuestionEditDeleteTest {
                 .andExpect(status().isNotFound());
         mockMvc.perform(post(questionUrl(mine, otherQid) + "/delete"))
                 .andExpect(status().isNotFound());
+    }
+    // Create and save a closed survey with one text question
+    private Survey closedSurvey() {
+        Survey survey = surveyWith(question("Locked?", QuestionType.TEXT));
+        survey.setActive(false);
+        return surveyRepository.save(survey);
+    }
+
+    // Questions page shows the lock message on a closed survey
+    @Test
+    void showsLockMessage() throws Exception {
+        Survey s = closedSurvey();
+        mockMvc.perform(get("/surveys/" + s.getId() + "/questions"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("locked"));
+    }
+
+    // Adding a question to a closed survey is refused
+    @Test
+    void cannotAddWhenClosed() throws Exception {
+        Survey s = closedSurvey();
+        mockMvc.perform(post("/surveys/" + s.getId() + "/questions")
+                        .param("text", "New")
+                        .param("questionType", "TEXT"))
+                .andExpect(status().isForbidden());
+        assertEquals(1, surveyRepository.findById(s.getId()).get().getQuestions().size());
+    }
+
+    // Editing a question on a closed survey is refused
+    @Test
+    void cannotEditWhenClosed() throws Exception {
+        Survey s = closedSurvey();
+        long qid = s.getQuestions().get(0).getId();
+        mockMvc.perform(get(questionUrl(s, qid) + "/edit"))
+                .andExpect(status().isForbidden());
+    }
+
+    // Deleting a question on a closed survey is refused
+    @Test
+    void cannotDeleteWhenClosed() throws Exception {
+        Survey s = closedSurvey();
+        long qid = s.getQuestions().get(0).getId();
+        mockMvc.perform(post(questionUrl(s, qid) + "/delete"))
+                .andExpect(status().isForbidden());
+        assertEquals(1, surveyRepository.findById(s.getId()).get().getQuestions().size());
     }
 }
