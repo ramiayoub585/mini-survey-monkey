@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:with="results=${path != null and #strings.endsWith(path, '/results')}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <title th:text="${results} ? 'Results are not ready yet' : 'This survey is closed'">This survey is closed</title>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header('')}"></header>
+<main>
+  <th:block th:unless="${results}">
+    <h1>This survey is closed</h1>
+    <p>It is no longer accepting responses.</p>
+    <p><a th:href="@{/respondent}">See other surveys</a></p>
+  </th:block>
+  <th:block th:if="${results}">
+    <h1>Results are not ready yet</h1>
+    <p>Results appear once the survey is closed.</p>
+    <p><a th:href="@{/surveyor}">Back to your surveys</a></p>
+  </th:block>
+  <p class="hint">Error code: 403</p>
+</main>
+</body>
+</html>

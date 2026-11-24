@@ -8,11 +8,12 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
   <title th:text="'Results - ' + ${survey.title}">Results</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script>
-    const COLORS = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f',
-      '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
+    const COLORS = ['#1d4fb8', '#e69f00', '#009e73', '#cc79a7', '#56b4e9', '#d55e00', '#80868e'];
 
     // Draws one chart: a bar histogram for NUMBER, a pie chart for CHOICE
     function drawChart(index, type, labels, values) {
@@ -73,7 +74,7 @@
               /*[[${r.chartLabels}]]*/ [], /*[[${r.chartValues}]]*/ []);
     </script>
 
-    <table th:if="${r.question.questionType?.name() != 'TEXT' and !#lists.isEmpty(r.answers)}" border="1" cellpadding="6">
+    <table th:if="${r.question.questionType?.name() != 'TEXT' and !#lists.isEmpty(r.answers)}">
       <thead><tr><th>Answer</th><th>Count</th></tr></thead>
       <tbody>
       <tr th:each="entry : ${r.counts}">
