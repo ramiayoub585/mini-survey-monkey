@@ -5,6 +5,7 @@
   <title>Mini-SurveyMonkey</title>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header('home')}"></header>
 <h1>Mini-SurveyMonkey</h1>
 <p>Welcome to Mini-SurveyMonkey! Please select from one of the following roles.</p>
 <p><a th:href="@{/surveyor}">I'm a Surveyor (create and manage surveys)</a></p>

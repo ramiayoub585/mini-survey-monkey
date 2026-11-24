@@ -5,7 +5,7 @@
     <title th:text="'Questions - ' + ${survey.title}">Questions</title>
 </head>
 <body>
-
+<header th:replace="~{fragments/header :: header('surveyor')}"></header>
 <h1 th:text="${survey.title}">Survey title</h1>
 <p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
 
