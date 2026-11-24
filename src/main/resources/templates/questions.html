@@ -2,10 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <title th:text="'Questions - ' + ${survey.title}">Questions</title>
 </head>
 <body>
-
+<header th:replace="~{fragments/header :: header('surveyor')}"></header>
 <h1 th:text="${survey.title}">Survey title</h1>
 <p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
 
@@ -24,7 +26,7 @@
 </ol>
 
 <h2>Add a question</h2>
-<p style="color: red" th:if="${error}" th:text="${error}">Error message</p>
+<p class="error" role="alert" th:if="${error}" th:text="${error}">Error message</p>
 
 <form th:action="@{/surveys/{id}/questions(id=${survey.id})}" th:object="${question}" method="post">
     <p>Question: <input type="text" th:field="*{text}" required size="60"></p>
