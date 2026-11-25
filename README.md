@@ -119,6 +119,32 @@ Since the default database is in memory, its contents are not saved on applicati
 - Merged changes to `main` are deployed to Azure automatically.
 - Weekly updates are posted in the "Weekly scrum" issues.
 
+## Testing
 
+The project uses JUnit 5 and Spring Boot MockMVC for automated testing. Tests are split by functionality to improve organization and make it easier to add new tests in the future.
 
+All test files are located in `src/test/java/org/minisurveymonkey/`.
+
+- **ApplicationTests.java** - Application startup and home page tests.
+- **SurveyControllerTests.java** - Survey creation, listing, closing, and results tests.
+- **QuestionControllerTests.java** - Question creation and validation tests.
+- **ResponseControllerTests.java** - Survey submission and response persistence tests.
+- **ErrorHandlingTests.java** - Error handling and invalid request tests.
+- **TestHelpers.java** - Shared helper methods for creating test surveys and questions.
+
+### Running Tests
+
+To run all tests:
+
+```
+mvn clean test
+```
+
+To run a specific test class:
+
+```
+mvn -Dtest=ResponseControllerTests test
+```
+
+Maven automatically discovers and executes all test classes.
 
