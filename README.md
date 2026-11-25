@@ -43,6 +43,24 @@ The `prod` profile reads its connection settings from environment variables
 To run locally against the Azure database, set those variables and add your IP
 to the server's firewall (Azure portal → server → Networking).
 
+## Milestone 1 (Completed)
+An early prototype of the application. The application is not fully polished but the main functionalities are working and are the following: 
+
+- **Survey Creation:** A surveyor is able to create a survey and manage a list of the created surveys. 
+- **Questions:** A surveyor can add a question (3 types: Text, Number, Choice) for the respondents to answer. 
+- **Filling Out Survey:** A respondent selects from the list of open surveys and fills out all questions for that survey. Once the survey is closed, they can no longer answer. 
+- **Closing and Results:** The surveyor closes the survey which becomes unavailable for the respondents. A results page is shown to the surveyor with the complied answers to the survey questions. The text answers are listed and number and choice answers are counted.
+- **Tests and Sample Data:** Startup tests run CI, integration tests are also added (see test folders). A sample survey can be loaded using the dev profile (DevSampleSurveys). 
+
+### Milestone 2 Plan (from Milestone 1)
+- Adding a method for surveyor authentication, ie. login credentials.
+- Displaying the results of the survey through charts (example: histogram, pie charts, etc.).
+- Giving confirmation to the user once they have successfully answered a survey. 
+- Having the ability to edit/delete a question from a survey. 
+- Styling the different pages making them look nicer and aligning them together. 
+- Handle some bugs, ie. remove the ability to add a question when a survey is closed, displaying min/max values to respondent for number questions, etc.
+- Tests for the new features ensuring functionality of the program remains consistent. 
+
 ## Milestone 2 (Current Phase)
 The alpha release. Everything from Milestone 1 works, plus the features and fixes from the TA's feedback:
 
@@ -54,6 +72,8 @@ The alpha release. Everything from Milestone 1 works, plus the features and fixe
 - **Database:** Data is stored in a persistent database on Azure, so surveys and responses survive a restart.
 - **Tests:** Unit and integration tests are split into files by behaviour and run in CI on every pull request. Sample surveys load with the `dev` profile (`DevSampleSurveys`).
 
+Surveyor login, from the Milestone 2 plan above, was moved to Milestone 3.
+
 ## Milestone 3 Plan
 The final release, shown at the final demo:
 
@@ -63,7 +83,11 @@ The final release, shown at the final demo:
 - **Tests:** Tests for each new feature, keeping CI green on every pull request.
 
 ## UML Diagram
+The class diagram for Milestone 2. It adds `OptionParser`, chart data in `QuestionResult`, editing and deleting questions in `QuestionController`, and the confirmation page in `ResponseController`. The source is `docs/uml-class-diagram.puml`.
+
 ![UML Class Diagram](docs/uml-class-diagram.png)
+
+The Milestone 1 diagram is kept in [docs/uml-class-diagram-milestone1.png](docs/uml-class-diagram-milestone1.png).
 
 ## Database Schema
 Mini Survey Monkey uses Spring Data JPA with Hibernate ORM to manage database persistence. Mini Survey Monkey uses an H2 in-memory database where the database schema is automatically generated from the JPA entity classes when the application starts. 
@@ -109,8 +133,8 @@ Since the default database is in memory, its contents are not saved on applicati
 
 | Column | Items |
 |---|---|
-| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results, Job 5 Tests and demo, Make repo public and protect main, Bundle 5 Results charts and multiple-choice fix |
-| In progress | Bundle 1 Real database and schema, Bundle 2 Edit/delete questions, Bundle 3 Answer validation, confirmation and test cleanup, Bundle 4 Header, styling and README |
+| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results, Job 5 Tests and demo, Make repo public and protect main, Bundle 1 Real database and schema, Bundle 2 Edit/delete questions, Bundle 3 Answer validation, confirmation and test cleanup, Bundle 5 Results charts and multiple-choice fix |
+| In progress | Bundle 4 Header, styling and README |
 | Backlog | Milestone 3 plan above |
 
 ## Development Process
@@ -131,6 +155,11 @@ All test files are located in `src/test/java/org/minisurveymonkey/`.
 - **QuestionControllerTests.java** - Question creation and validation tests.
 - **ResponseControllerTests.java** - Survey submission and response persistence tests.
 - **ErrorHandlingTests.java** - Error handling and invalid request tests.
+- **QuestionDeleteAndAddTest.java** - Editing, deleting and locking questions.
+- **OptionParserTests.java** - Parsing multiple-choice options.
+- **QuestionResultsTests.java** - Results counts, histograms and pie chart data.
+- **HeaderTests.java** - Shared header and navigation on every page.
+- **ErrorPageTests.java** - Friendly 404, 403 and generic error pages.
 - **TestHelpers.java** - Shared helper methods for creating test surveys and questions.
 
 ### Running Tests
