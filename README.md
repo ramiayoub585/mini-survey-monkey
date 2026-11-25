@@ -25,6 +25,23 @@ To start with sample surveys (one open and one closed), run the app with the `de
 ```
 java -jar target/Mini-SurveyMonkey-1.0-SNAPSHOT.jar --spring.profiles.active=dev
 ```
+### Production database
+The deployed app runs with the `prod` profile and uses an Azure Database for PostgreSQL
+Flexible Server (`msm-group25-db`, Canada Central). Data persists across restarts.
+Local runs and tests still use the in-memory H2 database by default.
+
+The `prod` profile reads its connection settings from environment variables
+(set in the Azure App Service → Environment variables, never committed):
+
+| Variable | Value |
+|---|---|
+| `SPRING_PROFILES_ACTIVE` | `prod` |
+| `DB_URL` | `jdbc:postgresql://<server>.postgres.database.azure.com:5432/surveydb?sslmode=require` |
+| `DB_USERNAME` | database admin login |
+| `DB_PASSWORD` | database password |
+
+To run locally against the Azure database, set those variables and add your IP
+to the server's firewall (Azure portal → server → Networking).
 
 ## Milestone 1 (Current Phase)
 An early prototype of the application. The application is not fully polished but the main functionalities are working and are the following: 
