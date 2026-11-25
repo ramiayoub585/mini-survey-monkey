@@ -25,6 +25,23 @@ To start with sample surveys (one open and one closed), run the app with the `de
 ```
 java -jar target/Mini-SurveyMonkey-1.0-SNAPSHOT.jar --spring.profiles.active=dev
 ```
+### Production database
+The deployed app runs with the `prod` profile and uses an Azure Database for PostgreSQL
+Flexible Server (`msm-group25-db`, Canada Central). Data persists across restarts.
+Local runs and tests still use the in-memory H2 database by default.
+
+The `prod` profile reads its connection settings from environment variables
+(set in the Azure App Service → Environment variables, never committed):
+
+| Variable | Value |
+|---|---|
+| `SPRING_PROFILES_ACTIVE` | `prod` |
+| `DB_URL` | `jdbc:postgresql://<server>.postgres.database.azure.com:5432/surveydb?sslmode=require` |
+| `DB_USERNAME` | database admin login |
+| `DB_PASSWORD` | database password |
+
+To run locally against the Azure database, set those variables and add your IP
+to the server's firewall (Azure portal → server → Networking).
 
 ## Milestone 2 (Current Phase)
 The alpha release. Everything from Milestone 1 works, plus the features and fixes from the TA's feedback:
@@ -103,6 +120,32 @@ Since the default database is in memory, its contents are not saved on applicati
 - Merged changes to `main` are deployed to Azure automatically.
 - Weekly updates are posted in the "Weekly scrum" issues.
 
+## Testing
 
+The project uses JUnit 5 and Spring Boot MockMVC for automated testing. Tests are split by functionality to improve organization and make it easier to add new tests in the future.
 
+All test files are located in `src/test/java/org/minisurveymonkey/`.
+
+- **ApplicationTests.java** - Application startup and home page tests.
+- **SurveyControllerTests.java** - Survey creation, listing, closing, and results tests.
+- **QuestionControllerTests.java** - Question creation and validation tests.
+- **ResponseControllerTests.java** - Survey submission and response persistence tests.
+- **ErrorHandlingTests.java** - Error handling and invalid request tests.
+- **TestHelpers.java** - Shared helper methods for creating test surveys and questions.
+
+### Running Tests
+
+To run all tests:
+
+```
+mvn clean test
+```
+
+To run a specific test class:
+
+```
+mvn -Dtest=ResponseControllerTests test
+```
+
+Maven automatically discovers and executes all test classes.
 

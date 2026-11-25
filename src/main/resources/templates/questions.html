@@ -2,10 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <title th:text="'Questions - ' + ${survey.title}">Questions</title>
 </head>
 <body>
-
+<header th:replace="~{fragments/header :: header('surveyor')}"></header>
 <h1 th:text="${survey.title}">Survey title</h1>
 <p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
 
@@ -13,6 +15,13 @@
 <p th:if="${#lists.isEmpty(survey.questions)}">No questions yet.</p>
 <ol>
     <li th:each="q : ${survey.questions}">
+        <span th:unless="${locked}">
+            <a th:href="@{/surveys/{s}/questions/{q}/edit(s=${survey.id},q=${q.id})}">Edit</a>
+            <form th:action="@{/surveys/{s}/questions/{q}/delete(s=${survey.id},q=${q.id})}" method="post"
+                  style="display:inline" onsubmit="return confirm('Delete this question?');">
+                <button type="submit">Delete</button>
+            </form>
+        </span>
         <span th:text="${q.text}">Question text</span>
         <span th:text="'(' + ${q.questionType} + ')'">(TEXT)</span>
         <span th:if="${q.questionType?.name() == 'NUMBER'}"
@@ -23,7 +32,9 @@
     </li>
 </ol>
 
-<h2>Add a question</h2>
+<p th:if="${locked}" th:text="${locked}" style="color: gray">Locked</p>
+<div th:unless="${locked}">
+    <h2>Add a question</h2>
 <p style="color: red" th:if="${error}" th:text="${error}">Error message</p>
 
 <form th:action="@{/surveys/{id}/questions(id=${survey.id})}" th:object="${question}" method="post">
@@ -47,7 +58,7 @@
 
     <button type="submit">Add question</button>
 </form>
-
+</div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script th:src="@{/js/question.js}"></script>
 </body>

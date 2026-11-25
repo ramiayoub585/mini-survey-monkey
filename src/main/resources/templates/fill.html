@@ -1,49 +1,103 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Survey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <title th:text="${fill.title}">Survey</title>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header('respondent')}"></header>
 <h1 th:text="${fill.title}">Survey title</h1>
-<p><a th:href="@{/surveys/{id}(id=${fill.id})}">Back to Survey Page</a></p>
 
-<p th:if="${#lists.isEmpty(fill.questions)}">No questions yet.</p>
+<p>
+  <a th:href="@{/respondent}">Back to Available Surveys</a>
+</p>
 
-<form th:action="@{/surveys/{id}/fill(id=${fill.id})}" method="post">
+<p>Please answer all questions before submitting.</p>
+
+<p th:if="${#lists.isEmpty(fill.questions)}">
+  No questions available.
+</p>
+
+<form th:action="@{/surveys/{id}/fill(id=${fill.id})}"
+      method="post">
+
   <ol>
     <li th:each="q : ${fill.questions}">
-      <span th:text="${q.text}">Question text</span>
 
-      <!-- TEXT: a free-text box -->
-      <input th:if="${q.questionType?.name() == 'TEXT'}"
-             type="text"
-             th:name="|q_${q.id}|"
-             required>
+      <!-- Question text -->
+      <p>
+        <strong th:text="${q.text}">
+          Question text
+        </strong>
+      </p>
 
-      <!-- NUMBER: picking a number within range -->
-      <input th:if="${q.questionType?.name() == 'NUMBER'}"
-             type="number"
-             th:name="|q_${q.id}|"
-             th:min="${q.minValue}"
-             th:max="${q.maxValue}"
-             required>
+      <!-- TEXT question -->
+      <div th:if="${q.questionType?.name() == 'TEXT'}">
 
-      <!-- CHOICE: picking one of the listed choices -->
-      <div th:if="${q.questionType?.name() == 'CHOICE'}">
-        <label th:each="option : ${q.options}">
-          <input type="radio"
-                 th:name="|q_${q.id}|"
-                 th:value="${option}"
-                 required>
-          <span th:text="${option}">Option</span>
-        </label>
+        <input type="text"
+               th:name="|q_${q.id}|"
+               th:value="${answers['q_' + q.id]}"
+               maxlength="255"
+               required>
       </div>
+
+      <!-- NUMBER question -->
+      <div th:if="${q.questionType?.name() == 'NUMBER'}">
+
+        <p>
+          <small th:text="|Enter a number between ${q.minValue} and ${q.maxValue}.|">
+            Allowed range
+          </small>
+        </p>
+
+        <input type="number"
+               step="1"
+               th:name="|q_${q.id}|"
+               th:min="${q.minValue}"
+               th:max="${q.maxValue}"
+               th:value="${answers['q_' + q.id]}"
+               required>
+      </div>
+
+      <!-- CHOICE question -->
+      <div th:if="${q.questionType?.name() == 'CHOICE'}">
+
+        <div th:each="option : ${q.options}">
+
+          <label>
+            <input type="radio"
+                   th:name="|q_${q.id}|"
+                   th:value="${option}"
+                   th:checked="${option == answers['q_' + q.id]}"
+                   required>
+
+            <span th:text="${option}">
+                            Option
+                        </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Server-side validation error -->
+      <p th:if="${errors.containsKey(q.id)}"
+         th:text="${errors[q.id]}"
+         style="color: red;"
+         role="alert">
+        Validation error
+      </p>
+
     </li>
   </ol>
 
-  <!-- Submit Button -->
-  <button type="submit">Submit</button>
+  <button type="submit"
+          th:disabled="${#lists.isEmpty(fill.questions)}">
+    Submit Survey
+  </button>
+
 </form>
+
 </body>
 </html>

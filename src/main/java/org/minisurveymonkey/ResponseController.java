@@ -8,18 +8,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The controller that handles the page where the respondents answer questions and how it gets the results of the questions.
  */
 @Controller
 public class ResponseController {
-
+    private static final int MAX_TEXT_LENGTH = 255;
     private final SurveyRepository surveyRepository;
     private final SurveyResponseRepository  surveyResponseRepository;
 
@@ -37,47 +35,122 @@ public class ResponseController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Survey is closed");
         }
         model.addAttribute("fill", fill);
+        model.addAttribute("answers", new HashMap<String, String>());
+        model.addAttribute("errors", new HashMap<Long, String>());
         return "fill";
     }
 
     // Confirm that the data gets received
     @PostMapping("/surveys/{id}/fill")
     public String submitSurvey(@PathVariable Long id,
-                               @RequestParam Map<String, String> params) {
-        Survey fill = surveyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                               @RequestParam Map<String, String> params,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+
+        Survey fill = surveyRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         if (!fill.isActive()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Survey is closed");
         }
 
-        SurveyResponse surveyResponse = new SurveyResponse();
-        surveyResponse.setSurvey(fill);
+        // Store validation errors by question ID
+        Map<Long, String> errors = new LinkedHashMap<>();
 
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            String key = entry.getKey();      // e.g. "q_2"
-            String value = entry.getValue();  // e.g. "10"
+        // Validate every question belonging to this survey
+        for (Question question : fill.getQuestions()) {
+            String key = "q_" + question.getId();
+            String value = params.get(key);
 
-            // 1. skip anything that isn't an answer
-            if (!key.startsWith("q_")) continue;
+            // All questions are required
+            if (value == null || value.isBlank()) {
+                errors.put(question.getId(), "This question is required.");
+                continue;
+            }
 
-            // 2. "q_2" → 2L
-            Long questionId = Long.parseLong(key.substring(2));
+            if (question.getQuestionType() == null) {
+                errors.put(question.getId(), "Invalid question type.");
+                continue;
+            }
 
-            // 3. find that question in THIS survey
-            // loop over fill.getQuestions(), match on getId()
-            for (Question question : fill.getQuestions()) {
-                if (questionId.equals(question.getId())) {
-                    Answer answer = new Answer();
-                    answer.setQuestion(question);
-                    answer.setAnswer(value);
-                    surveyResponse.addAnswer(answer);
-                }
+            // Check question based on type
+            switch (question.getQuestionType()) {
+                case TEXT:
+                    if (value.length() > MAX_TEXT_LENGTH) {
+                        errors.put(question.getId(), "Text must be " + MAX_TEXT_LENGTH + " characters or fewer.");
+                    }
+                    break;
+
+                case NUMBER:
+                    try {
+                        int number = Integer.parseInt(value);
+
+                        Integer min = question.getMinValue();
+                        Integer max = question.getMaxValue();
+
+                        if (min == null || max == null) {
+                            errors.put(question.getId(), "This question has an invalid range.");
+                        } else if (number < min || number > max) {
+                            errors.put(question.getId(), "Enter a number between " + min + " and " + max + ".");
+                        }
+
+                    } catch (NumberFormatException e) {
+                        errors.put(question.getId(), "Please enter a valid whole number.");
+                    }
+                    break;
+
+                case CHOICE:
+                    if (question.getOptions() == null || !question.getOptions().contains(value)) {
+                        errors.put(question.getId(), "Please select a valid option.");
+                    }
+                    break;
+
+                default:
+                    errors.put(question.getId(), "Unsupported question type.");
             }
         }
 
-        SurveyResponse saved = surveyResponseRepository.save(surveyResponse);
-        return "redirect:/respondent";
+        // If validation fails, show the form again.
+        // Do not save any responses.
+        if (!errors.isEmpty()) {
+            model.addAttribute("fill", fill);
+            model.addAttribute("errors", errors);
+            model.addAttribute("answers", params);
+
+            return "fill";
+        }
+
+        // If all answers are valid create one complete response
+        SurveyResponse surveyResponse = new SurveyResponse();
+        surveyResponse.setSurvey(fill);
+
+        for (Question question : fill.getQuestions()) {
+            String key = "q_" + question.getId();
+            String value = params.get(key);
+            Answer answer = new Answer();
+            answer.setQuestion(question);
+            answer.setAnswer(value);
+            surveyResponse.addAnswer(answer);
+        }
+
+        // Save survey
+        surveyResponseRepository.save(surveyResponse);
+        redirectAttributes.addFlashAttribute("submissionSuccess", true);
+
+        return "redirect:/surveys/" + id + "/confirmation";
+    }
+
+    // Show confirmation after successful submission
+    @GetMapping("/surveys/{id}/confirmation")
+    public String confirmation(@PathVariable Long id, Model model) {
+        Survey survey = surveyRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // Prevent direct access without a successful submission
+        if (!Boolean.TRUE.equals(model.getAttribute("submissionSuccess"))) {
+            return "redirect:/respondent";
+        }
+
+        model.addAttribute("survey", survey);
+        return "confirmation";
     }
 
     // Get the results of the respondents once the survey is closed.
