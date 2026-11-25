@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<header th:fragment="header(active)">
+  <a th:href="@{/}">Mini-SurveyMonkey</a>
+  <nav aria-label="Main">
+    <a th:href="@{/surveyor}" th:aria-current="${active == 'surveyor'} ? 'page'">Manage surveys</a>
+    <a th:href="@{/respondent}" th:aria-current="${active == 'respondent'} ? 'page'">Take a survey</a>
+  </nav>
+</header>
+</body>
+</html>

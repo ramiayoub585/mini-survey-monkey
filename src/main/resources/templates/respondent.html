@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
   <title>Take a survey</title>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header('respondent')}"></header>
 <h1>Available Surveys</h1>
-<p><a th:href="@{/}">Back to the Home Page</a></p>
 
 <p th:if="${#lists.isEmpty(surveys)}">No surveys are open right now. Check back soon.</p>
 

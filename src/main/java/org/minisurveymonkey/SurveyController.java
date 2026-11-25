@@ -40,9 +40,17 @@ public class SurveyController {
 
     // Creating a new survey
     @PostMapping("/surveys")
-    public String createSurvey(@RequestParam String title) {
+    public String createSurvey(@RequestParam(defaultValue = "") String title, Model model) {
+        String cleaned = title.trim();
+        if (cleaned.isEmpty()) {
+            // Show the page again with an error, keeping what was typed
+            model.addAttribute("surveys", surveyRepository.findAll());
+            model.addAttribute("title", title);
+            model.addAttribute("error", "Survey title cannot be blank.");
+            return "surveyor";
+        }
         Survey survey = new Survey();
-        survey.setTitle(title.trim());
+        survey.setTitle(cleaned);
         survey.setActive(true);
         surveyRepository.save(survey);
         return "redirect:/surveyor";

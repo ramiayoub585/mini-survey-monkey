@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Survey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <title th:text="${survey.title}">Survey</title>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header('surveyor')}"></header>
 <h1 th:text="${survey.title}">Survey</h1>
-<p><a th:href="@{/surveyor}">Back to the Surveyors Page</a></p>
 
-<p>Status: <span th:text="${survey.active} ? 'Open' : 'Closed'">Open</span></p>
+<p>Status: <span class="badge" th:classappend="${survey.active} ? 'open' : 'closed'" th:text="${survey.active} ? 'Open' : 'Closed'">Open</span></p>
 <p>Questions: <span th:text="${#lists.size(survey.questions)}">0</span></p>
 <p><a th:href="@{/surveys/{id}/questions(id=${survey.id})}">Add or view questions</a></p>
 
-<form th:if="${survey.active}" th:action="@{/surveys/{id}/close(id=${survey.id})}" method="post">
-  <button type="submit">Close survey</button>
+<form th:if="${survey.active}" th:action="@{/surveys/{id}/close(id=${survey.id})}" method="post"
+      onsubmit="return confirm('Close this survey? Respondents will no longer be able to answer it.');">
+  <button type="submit" class="danger">Close survey</button>
 </form>
 <p th:unless="${survey.active}"><a th:href="@{/surveys/{id}/results(id=${survey.id})}">View results</a></p>
 </body>
