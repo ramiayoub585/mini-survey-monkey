@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit question</title>
+</head>
+<body>
+
+<h1 th:text="'Edit question - ' + ${survey.title}">Edit question</h1>
+<p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
+
+
+<p style="color: red" th:if="${error}" th:text="${error}">Error message</p>
+
+<form th:action="@{/surveys/{s}/questions/{q}/edit(s=${survey.id},q=${questionId})}" th:object="${question}" method="post">
+    <p>Question: <input type="text" th:field="*{text}" required size="60"></p>
+
+    <p>Type:
+        <select th:field="*{questionType}">
+            <option th:each="t : ${questionTypes}" th:value="${t}" th:text="${t}">TEXT</option>
+        </select>
+    </p>
+
+    <div id="numberFields">
+        <p>Minimum: <input type="number" th:field="*{minValue}"></p>
+        <p>Maximum: <input type="number" th:field="*{maxValue}"></p>
+    </div>
+
+    <div id="choiceFields">
+        <p>Options (separated by commas or new lines):</p>
+        <textarea name="optionsText" rows="5" cols="40" th:text="${optionsText}"></textarea>
+    </div>
+
+    <button type="submit">Save changes</button>
+    <a th:href="@{/surveys/{id}/questions(id=${survey.id})}">Cancel</a>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script th:src="@{/js/question.js}"></script>
+</body>
+</html>
