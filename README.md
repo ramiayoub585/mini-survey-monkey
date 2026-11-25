@@ -14,7 +14,7 @@ The Mini-SurveyMonkey is a small web app where a surveyor creates a survey with 
 - Andrew Tawfik 
 
 ## How to Run
-Requires Java 21 or later and Maven.
+Requires Java 23 or later and Maven.
 ```
 git clone https://github.com/ramiayoub585/mini-survey-monkey.git
 cd mini-survey-monkey
@@ -43,7 +43,7 @@ The `prod` profile reads its connection settings from environment variables
 To run locally against the Azure database, set those variables and add your IP
 to the server's firewall (Azure portal → server → Networking).
 
-## Milestone 1 (Current Phase)
+## Milestone 1 (Completed)
 An early prototype of the application. The application is not fully polished but the main functionalities are working and are the following: 
 
 - **Survey Creation:** A surveyor is able to create a survey and manage a list of the created surveys. 
@@ -52,7 +52,7 @@ An early prototype of the application. The application is not fully polished but
 - **Closing and Results:** The surveyor closes the survey which becomes unavailable for the respondents. A results page is shown to the surveyor with the complied answers to the survey questions. The text answers are listed and number and choice answers are counted.
 - **Tests and Sample Data:** Startup tests run CI, integration tests are also added (see test folders). A sample survey can be loaded using the dev profile (DevSampleSurveys). 
 
-## Next Sprint 
+### Milestone 2 Plan (from Milestone 1)
 - Adding a method for surveyor authentication, ie. login credentials.
 - Displaying the results of the survey through charts (example: histogram, pie charts, etc.).
 - Giving confirmation to the user once they have successfully answered a survey. 
@@ -61,8 +61,33 @@ An early prototype of the application. The application is not fully polished but
 - Handle some bugs, ie. remove the ability to add a question when a survey is closed, displaying min/max values to respondent for number questions, etc.
 - Tests for the new features ensuring functionality of the program remains consistent. 
 
+## Milestone 2 (Current Phase)
+The alpha release. Everything from Milestone 1 works, plus the features and fixes from the TA's feedback:
+
+- **Surveys:** A surveyor creates surveys and manages them from one list, with each survey marked Open or Closed.
+- **Questions:** A surveyor adds text, number (with a min and max) and multiple-choice questions, and can edit or delete them. Questions are locked once a survey is closed or has answers.
+- **Filling Out a Survey:** A respondent picks an open survey, answers every question and sees a confirmation page. Answers are checked on the server, and number questions show their allowed range. Closed surveys can no longer be answered.
+- **Closing and Results:** The surveyor closes a survey after confirming. The results page lists text answers, shows a histogram for number questions and a pie chart for multiple-choice questions, with the counts underneath.
+- **Navigation and Styling:** Every page shares a header with links home, to Manage surveys and to Take a survey. All pages use one stylesheet, work at phone width, and show a friendly page for errors such as a missing or closed survey.
+- **Database:** Data is stored in a persistent database on Azure, so surveys and responses survive a restart.
+- **Tests:** Unit and integration tests are split into files by behaviour and run in CI on every pull request. Sample surveys load with the `dev` profile (`DevSampleSurveys`).
+
+Surveyor login, from the Milestone 2 plan above, was moved to Milestone 3.
+
+## Milestone 3 Plan
+The final release, shown at the final demo:
+
+- **Surveyor login:** Surveyors sign in, and each surveyor only sees and manages their own surveys. Respondents can still answer without an account.
+- **Form accessibility:** Every question on the fill and add-question pages gets a proper label, so the forms work with screen readers and keyboards.
+- **Demo feedback:** Fix the bugs and usability issues found at the Milestone 2 demo.
+- **Tests:** Tests for each new feature, keeping CI green on every pull request.
+
 ## UML Diagram
+The class diagram for Milestone 2. It adds `OptionParser`, chart data in `QuestionResult`, editing and deleting questions in `QuestionController`, and the confirmation page in `ResponseController`. The source is `docs/uml-class-diagram.puml`.
+
 ![UML Class Diagram](docs/uml-class-diagram.png)
+
+The Milestone 1 diagram is kept in [docs/uml-class-diagram-milestone1.png](docs/uml-class-diagram-milestone1.png).
 
 ## Database Schema
 Mini Survey Monkey uses Spring Data JPA with Hibernate ORM to manage database persistence. Mini Survey Monkey uses an H2 in-memory database where the database schema is automatically generated from the JPA entity classes when the application starts. 
@@ -106,11 +131,11 @@ Since the default database is in memory, its contents are not saved on applicati
 ## Project Status
 [Mini-SurveyMonkey Board](https://github.com/users/ramiayoub585/projects/2)
 
-| Column | Items                                                                                                                         |
-|---|-------------------------------------------------------------------------------------------------------------------------------|
-| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results and Job 5 Tests and demo |
-| In progress | -                                                                                                                             |
-| Backlog | -                                                                                                                             |
+| Column | Items |
+|---|---|
+| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results, Job 5 Tests and demo, Make repo public and protect main, Bundle 1 Real database and schema, Bundle 2 Edit/delete questions, Bundle 3 Answer validation, confirmation and test cleanup, Bundle 5 Results charts and multiple-choice fix |
+| In progress | Bundle 4 Header, styling and README |
+| Backlog | Milestone 3 plan above |
 
 ## Development Process
 - Every feature is built on its own branch.
@@ -130,6 +155,11 @@ All test files are located in `src/test/java/org/minisurveymonkey/`.
 - **QuestionControllerTests.java** - Question creation and validation tests.
 - **ResponseControllerTests.java** - Survey submission and response persistence tests.
 - **ErrorHandlingTests.java** - Error handling and invalid request tests.
+- **QuestionDeleteAndAddTest.java** - Editing, deleting and locking questions.
+- **OptionParserTests.java** - Parsing multiple-choice options.
+- **QuestionResultsTests.java** - Results counts, histograms and pie chart data.
+- **HeaderTests.java** - Shared header and navigation on every page.
+- **ErrorPageTests.java** - Friendly 404, 403 and generic error pages.
 - **TestHelpers.java** - Shared helper methods for creating test surveys and questions.
 
 ### Running Tests

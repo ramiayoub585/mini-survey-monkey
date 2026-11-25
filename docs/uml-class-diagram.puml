@@ -1,0 +1,171 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+package "Model" {
+  class Survey <<Entity>> {
+    - id : long
+    - title : String
+    - active : boolean
+    - questions : List<Question>
+    + getId() : long
+    + getTitle() : String
+    + setTitle(String) : void
+    + isActive() : boolean
+    + setActive(boolean) : void
+    + getQuestions() : List<Question>
+    + addQuestion(Question) : void
+    + removeQuestion(Question) : void
+  }
+
+  class Question <<Entity>> {
+    - id : long
+    - questionType : QuestionType
+    - text : String
+    - minValue : Integer
+    - maxValue : Integer
+    - options : List<String>
+    + getId() : long
+    + getText() : String
+    + setText(String) : void
+    + getMinValue() : Integer
+    + setMinValue(Integer) : void
+    + getMaxValue() : Integer
+    + setMaxValue(Integer) : void
+    + getQuestionType() : QuestionType
+    + setQuestionType(QuestionType) : void
+    + getType() : QuestionType
+    + getOptions() : List<String>
+    + validate() : String
+  }
+
+  enum QuestionType {
+    TEXT
+    NUMBER
+    CHOICE
+  }
+
+  class SurveyResponse <<Entity>> {
+    - id : long
+    - survey : Survey
+    - answers : List<Answer>
+    + getId() : long
+    + getSurvey() : Survey
+    + setSurvey(Survey) : void
+    + getAnswers() : List<Answer>
+    + addAnswer(Answer) : void
+  }
+
+  class Answer <<Entity>> {
+    - id : long
+    - question : Question
+    - answer : String
+    + getId() : long
+    + getQuestion() : Question
+    + setQuestion(Question) : void
+    + getAnswer() : String
+    + setAnswer(String) : void
+  }
+
+  class QuestionResult {
+    - question : Question
+    - answers : List<String>
+    - counts : Map<String, Long>
+    - chartLabels : List<String>
+    - chartValues : List<Long>
+    + QuestionResult(Question, List<String>)
+    - buildHistogram(List<String>) : void
+    - {static} toNumber(String) : Double
+    + getQuestion() : Question
+    + getAnswers() : List<String>
+    + getCounts() : Map<String, Long>
+    + getChartLabels() : List<String>
+    + getChartValues() : List<Long>
+    + isChartable() : boolean
+  }
+
+  class OptionParser <<utility>> {
+    + {static} parse(String) : List<String>
+  }
+}
+
+package "Repositories" {
+  interface SurveyRepository <<JpaRepository>> {
+    + findByActiveTrue() : List<Survey>
+  }
+
+  interface SurveyResponseRepository <<JpaRepository>> {
+    + findBySurvey(Survey) : List<SurveyResponse>
+    + existsBySurvey(Survey) : boolean
+  }
+}
+
+package "Controllers" {
+  class SurveyController <<Controller>> {
+    - surveyRepository : SurveyRepository
+    + home() : String
+    + surveyor(Model) : String
+    + respondent(Model) : String
+    + createSurvey(String, Model) : String
+    + viewSurvey(Long, Model) : String
+    + closeSurvey(Long) : String
+  }
+
+  class QuestionController <<Controller>> {
+    - surveyRepository : SurveyRepository
+    - responseRepository : SurveyResponseRepository
+    + showQuestions(long, Model) : String
+    + addQuestion(long, Question, String, Model) : String
+    + editForm(long, long, Model) : String
+    + editQuestions(long, long, Question, String, Model) : String
+    + deleteQuestion(long, long) : String
+    - findSurvey(long) : Survey
+    - findQuestion(Survey, long) : Question
+    - applyForm(Question, Question, String) : void
+    - lockReason(Survey) : String
+    - requireUnlocked(Survey) : void
+  }
+
+  class ResponseController <<Controller>> {
+    - {static} MAX_TEXT_LENGTH : int
+    - surveyRepository : SurveyRepository
+    - surveyResponseRepository : SurveyResponseRepository
+    + takeSurvey(Long, Model) : String
+    + submitSurvey(Long, Map<String, String>, Model, RedirectAttributes) : String
+    + confirmation(Long, Model) : String
+    + viewResults(Long, Model) : String
+  }
+}
+
+class DevSampleSurveys <<Profile dev>> {
+  - surveyRepository : SurveyRepository
+  + run(String...) : void
+  - buildSurvey(String, boolean) : Survey
+}
+
+class SurveyMonkeyApplication <<SpringBootApplication>> {
+  + {static} main(String[]) : void
+}
+
+Survey "1" *-- "0..*" Question : questions
+Question --> "1" QuestionType : questionType
+SurveyResponse "0..*" --> "1" Survey : survey
+SurveyResponse "1" *-- "0..*" Answer : answers
+Answer "0..*" --> "1" Question : question
+QuestionResult --> "1" Question : question
+
+SurveyController --> SurveyRepository
+QuestionController --> SurveyRepository
+QuestionController --> SurveyResponseRepository
+QuestionController ..> OptionParser : uses
+ResponseController --> SurveyRepository
+ResponseController --> SurveyResponseRepository
+ResponseController ..> QuestionResult : creates
+ResponseController ..> SurveyResponse : creates
+ResponseController ..> Answer : creates
+QuestionController ..> Question : creates
+SurveyController ..> Survey : creates
+DevSampleSurveys ..> Survey : creates
+DevSampleSurveys --> SurveyRepository
+@enduml
