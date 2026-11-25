@@ -2,11 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Survey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <title th:text="${fill.title}">Survey</title>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header('respondent')}"></header>
 <h1 th:text="${fill.title}">Survey title</h1>
-<p><a th:href="@{/surveys/{id}(id=${fill.id})}">Back to Survey Page</a></p>
 
 <p th:if="${#lists.isEmpty(fill.questions)}">No questions yet.</p>
 

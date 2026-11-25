@@ -8,16 +8,20 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
   <title th:text="'Results - ' + ${survey.title}">Results</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script>
-    const COLORS = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f',
-      '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac'];
+    const COLORS = ['#1d4fb8', '#e69f00', '#009e73', '#cc79a7', '#56b4e9', '#d55e00', '#80868e'];
 
     // Draws one chart: a bar histogram for NUMBER, a pie chart for CHOICE
     function drawChart(index, type, labels, values) {
       const canvas = document.getElementById('chart-' + index);
       if (!canvas) return;
+      const style = getComputedStyle(canvas);
+      Chart.defaults.font.family = style.fontFamily;
+      Chart.defaults.color = style.getPropertyValue('--ink-muted');
       if (type === 'CHOICE') {
         const total = values.reduce((a, b) => a + b, 0);
         new Chart(canvas, {
@@ -27,7 +31,8 @@
             labels: labels.map((label, i) =>
                     label + ': ' + values[i] + ' (' + (total ? Math.round(values[i] * 100 / total) : 0) + '%)'),
             datasets: [{ data: values, backgroundColor: values.map((v, i) => COLORS[i % COLORS.length]) }]
-          }
+          },
+          options: { aspectRatio: 1.5 }
         });
       } else {
         new Chart(canvas, {
@@ -46,6 +51,7 @@
   </script>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header('surveyor')}"></header>
 <h1 th:text="${survey.title}">Survey title</h1>
 <p><a th:href="@{/surveys/{id}(id=${survey.id})}">Back to Survey Page</a></p>
 
@@ -64,7 +70,7 @@
       <li th:each="a : ${r.answers}" th:text="${a}">Answer</li>
     </ul>
 
-    <div th:if="${r.chartable}" style="max-width: 480px;">
+    <div th:if="${r.chartable}">
       <canvas th:id="'chart-' + ${rStat.index}"></canvas>
     </div>
     <script th:if="${r.chartable}" th:inline="javascript">
@@ -72,7 +78,7 @@
               /*[[${r.chartLabels}]]*/ [], /*[[${r.chartValues}]]*/ []);
     </script>
 
-    <table th:if="${r.question.questionType?.name() != 'TEXT' and !#lists.isEmpty(r.answers)}" border="1" cellpadding="6">
+    <table th:if="${r.question.questionType?.name() != 'TEXT' and !#lists.isEmpty(r.answers)}">
       <thead><tr><th>Answer</th><th>Count</th></tr></thead>
       <tbody>
       <tr th:each="entry : ${r.counts}">
