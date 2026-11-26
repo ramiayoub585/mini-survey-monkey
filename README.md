@@ -90,8 +90,10 @@ The class diagram for Milestone 2. It adds `OptionParser`, chart data in `Questi
 The Milestone 1 diagram is kept in [docs/uml-class-diagram-milestone1.png](docs/uml-class-diagram-milestone1.png).
 
 ## Database Schema
-Mini Survey Monkey uses Spring Data JPA with Hibernate ORM to manage database persistence. Mini Survey Monkey uses an H2 in-memory database where the database schema is automatically generated from the JPA entity classes when the application starts. 
-The database is used to store surveys, questions, responses and answers.
+Mini-SurveyMonkey uses Spring Data JPA with Hibernate as its ORM. The tables are generated
+from the JPA entity classes. This diagram was generated from the production PostgreSQL database.
+
+![Database Schema](docs/schema-diagram.png)
 
 ### Main Entities
 This table lists the entities and fields in the database.
@@ -112,9 +114,9 @@ This table lists the entities and fields in the database.
 ### Additional Database Tables
 Hibernate also generates additional tables to persist collections and relationships:
 
-- **Survey questions collection:** Maintains the association and ordering of questions within each survey.
-- **Question options collection:** Stores the available options for multiple-choice questions and their order.
-- **Survey response answers collection:** Maintains the association between survey responses and their answers.
+- **`survey_questions`**: join table linking each survey to its questions; `questions_order` keeps their order (`@OneToMany` + `@OrderColumn`).
+- **`question_options`**: one row per multiple-choice option; `options_order` keeps their order (`@ElementCollection` + `@OrderColumn`).
+- **`survey_response_answers`**: join table linking each response to its answers (`@OneToMany` without `mappedBy`).
 
 ### Question Types
 Questions use the `QuestionType` enumeration, which has the following options:
@@ -124,9 +126,12 @@ Questions use the `QuestionType` enumeration, which has the following options:
 - `CHOICE`: Multiple choice responses with a list of options.
 
 ### Database Configuration
-Spring Boot configures the database connection, while Hibernate manages the database schema based on the JPA entity mappings.
+Spring Boot configures the database connection, and Hibernate (the JPA ORM) creates and
+updates the tables from the entity mappings (`spring.jpa.hibernate.ddl-auto=update`).
 
-Since the default database is in memory, its contents are not saved on application shut down.
+- **Local runs and tests:** in-memory H2 database. Its contents are lost when the application stops.
+- **Deployed app (`prod` profile):** Azure Database for PostgreSQL Flexible Server. Data persists
+  across restarts and redeploys. Connection settings come from environment variables (see How to Run).
 
 ## Project Status
 [Mini-SurveyMonkey Board](https://github.com/users/ramiayoub585/projects/2)
