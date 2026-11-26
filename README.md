@@ -138,8 +138,8 @@ updates the tables from the entity mappings (`spring.jpa.hibernate.ddl-auto=upda
 
 | Column | Items |
 |---|---|
-| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results, Job 5 Tests and demo, Make repo public and protect main, Bundle 1 Real database and schema, Bundle 2 Edit/delete questions, Bundle 3 Answer validation, confirmation and test cleanup, Bundle 5 Results charts and multiple-choice fix |
-| In progress | Bundle 4 Header, styling and README |
+| Completed | Job 1 Setup and surveys, Job 2 Add questions to a survey, Job 3 Filling out, Job 4 Close and results, Job 5 Tests and demo, Make repo public and protect main, Bundle 1 Real database and schema, Bundle 2 Edit/delete questions, Bundle 3 Answer validation, confirmation and test cleanup, Bundle 5 Results charts and multiple-choice fix, Bundle 4 Header, styling and README|
+| In progress |  |
 | Backlog | Milestone 3 plan above |
 
 ## Development Process
